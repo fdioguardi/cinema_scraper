@@ -1,0 +1,7 @@
+Bueno uno de los primeros desafios que encontramos al desarrollar el Scrapper fue debido a la decision de crear en Python un objeto Movie 
+para almacenar los datos obtenidos por el Scrapper. 
+El problema surge cuando, al tener un Scrapper que escarba en la pagina de Cinema La Plata y otro en Cinepolis, 
+lo mas probable es que aparescan peliculas repetidas en ambas paginas y nuestro desafio fue evitar esa redundancia de informacion 
+al almacenar los datos de ambas paginas. En resumen, el problema fue como si existen 2 objetos Movie con el mismo titulo de pelicula, 
+lo que lo hacen en esencia la misma pelicula, fusionar o mergear esos dos objetos de tipo Movie 
+en un unico objeto con los datos de ambas peliculas obtenidas de las dos paginas
