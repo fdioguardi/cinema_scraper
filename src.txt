@@ -1,0 +1,4 @@
+x = Scrapper()
+x.add(CinemaLaPlataScrappy())
+x.add(CinepolisScrappy())
+x.scrap()
