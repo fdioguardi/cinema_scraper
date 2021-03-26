@@ -9,7 +9,7 @@ class Scrapper():
         self.scrappys = []
 
     def add(self, scrappy):
-        pass
+        self.scrappys.append(scrappy)
 
     def scrap():
         pass
