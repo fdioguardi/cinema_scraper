@@ -44,52 +44,30 @@ class CinemaLaPlataScrappy(CinemaScrappy):
 
     def _scrape_movie_traits(self, movie_container):
         return {
-            trait.find("h4")
-            .get_text()
-            .strip(): trait.find("span")
-            .get_text()
-            .strip()
+            trait.h4.get_text().strip(): trait.span.get_text().strip()
             for trait in movie_container.find_all(
                 "div", attrs={"class": "dropcap6"}
             )
         }
 
     def _scrape_movie_schedule(self, movie_container):
-        # {
-        #   movie 1 = {
-        #     horarios = {
-        #       cine 1 =
-        #       cine 2 =
-        #       cine 3 =
-        #     }
-        #   }
-        # }
-
         schedule_container = movie_container.find(
             "div", attrs={"id": "ctl00_cph_pnFunciones"}
         )
 
-        # movie_schedule_children = movie_schedule.findChildren()
-        # movie_data[movie_schedule_children[0].get_text().strip()] = {}
-        # del movie_schedule_children[0]
-        # for schedule in movie_schedule_children:
-        #     pass
-        horarios = {
-            cinema.find("span")
-            .get_text()
-            .strip(): cinema.find("p")
-            .get_text()
-            .strip()
-            .split(r"\n")
-            for cinema in movie_container.find_all(
-                "div", attrs={"class": "col-2"}
-            )
+        return {
+            schedule_container.h4.get_text().strip(): {
+                cinema.span.get_text()
+                .strip(): cinema.p.get_text()
+                .strip()
+                .split("\n")
+                for cinema in schedule_container.find_all(
+                    "div", attrs={"class": "col-2"}
+                )
+            }
         }
 
-        return {schedule_container.find("h4").get_text().strip(): horarios}
-
     def _scrape_movie(self, movie_link):
-        # Tomamos los datos de la pelicula
         movie_container = self._make_soup(self._cinema_page + movie_link)
 
         movie = self._scrape_movie_traits(movie_container)
@@ -112,10 +90,5 @@ class CinemaLaPlataScrappy(CinemaScrappy):
 
         movies = {}
         for movie in movies_container:
-            movies.update(self._scrape_movie(movie.find("a").get("href")))
-            print(movies)
-            return 0
+            movies.update(self._scrape_movie(movie.a.get("href")))
         return movies
-
-
-CinemaLaPlataScrappy().scrape()
