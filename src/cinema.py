@@ -12,18 +12,6 @@ class CinemaScrappy(ABC):
     def __init__(self, _cinema_page):
         self._cinema_page = _cinema_page
 
-    def _make_soup(self, link):
-        """Prepare a nutritious soup to begin scrapping
-
-        Args:
-            link (string): url for the page to make the beatifulsoup object
-
-        Returns:
-            BeatifulSoup: HTML form page to scrap
-        """
-
-        return BeautifulSoup(requests.get(link).text, "html.parser")
-
     @abstractmethod
     def scrape(self):
         """Fetch movies' info in _cinema_page, return a list """
@@ -36,6 +24,18 @@ class CinemaLaPlataScrappy(CinemaScrappy):
 
     def __init__(self):
         super().__init__(_cinema_page="http://www.cinemalaplata.com/")
+
+    def _make_soup(self, link):
+        """Prepare a nutritious soup to begin scrapping
+
+        Args:
+            link (string): url for the page to make the beatifulsoup object
+
+        Returns:
+            BeatifulSoup: HTML form page to scrap
+        """
+
+        return BeautifulSoup(requests.get(link).text, "html.parser")
 
     def _scrape_movie_title(self, movie_container):
         return (
