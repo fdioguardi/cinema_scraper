@@ -28,7 +28,7 @@ class Scrapper:
     def _merge(self, a, b):
         """Merge 2 dictionaries 'a' and 'b' containing movie data"""
 
-        shared_movies = set(a.keys()).union(set(b.keys()))
+        shared_movies = set(a.keys()).intersection(set(b.keys()))
 
         movies = dict(
             self._difference(a, shared_movies),
