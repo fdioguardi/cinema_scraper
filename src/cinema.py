@@ -39,7 +39,7 @@ class CinemaLaPlataScrappy(CinemaScrappy):
 
     def _scrape_movie_title(self, movie_container):
         return (
-            movie_container.find("div", class_="page-title").get_text().strip()
+            movie_container.find("div", class_="page-title").get_text().strip().upper()
         )
 
     def _scrape_movie_traits(self, movie_container):
