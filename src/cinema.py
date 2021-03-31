@@ -29,13 +29,13 @@ class CinemaLaPlataScrappy(CinemaScrappy):
             .upper()
         )
 
-    def _scrape_movie_traits(self, movie_container):
+    def _collect_movie_traits(self, movie_container):
         return {
             trait.h4.get_text().strip(): trait.span.get_text().strip()
             for trait in movie_container.find_all(
                 "div", attrs={"class": "dropcap6"}
             )
-        }
+        }, "/"
 
     def _scrape_movie_synopsis(self, movie_container):
         return {
@@ -63,7 +63,18 @@ class CinemaLaPlataScrappy(CinemaScrappy):
 
     def scrape_movie(self, movie_link):
         movie_container = self._make_soup(self._cinema_page + movie_link)
-        super.scrape_movie(movie_container)
+        return super().scrape_movie(movie_container)
+
+    def _normalize_movie(self, movie):
+        normalized_keys = {
+            "Calificacion": "Calificación",
+            "Duracion": "Duración",
+        }
+
+        for key, normalized_key in normalized_keys.items():
+            movie[normalized_key] = movie.pop(key)
+
+        return movie
 
     def scrape(self):
         """
@@ -76,4 +87,5 @@ class CinemaLaPlataScrappy(CinemaScrappy):
         movies = {}
         for movie in movies_container:
             movies.update(self.scrape_movie(movie.a.get("href")))
-        return movies
+
+        return movies, "Cinema La Plata"

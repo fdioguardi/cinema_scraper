@@ -19,25 +19,37 @@ class CinemaScrappy(ABC):
     def _scrape_movie_synopsis(self, movie_container):
         return
 
-    @abstractmethod
     def _scrape_movie_traits(self, movie_container):
-        return
+        traits, list_separator = self._collect_movie_traits(movie_container)
+
+        for trait in ["Actores", "Género"]:
+            if trait in traits.keys():
+                traits[trait] = traits[trait].split(list_separator)
+
+        return traits
 
     @abstractmethod
     def _scrape_movie_schedule(self, movie_container):
         return
 
     def scrape_movie(self, movie_container):
+        movie = reduce(
+            lambda a, b: {**a, **b},
+            [
+                self._scrape_movie_synopsis(movie_container),
+                self._scrape_movie_traits(movie_container),
+                self._scrape_movie_schedule(movie_container),
+            ],
+        )
         return {
-            self._scrape_movie_title(movie_container): reduce(
-                lambda a, b: {**a, **b},
-                [
-                    self._scrape_movie_synopsis(movie_container),
-                    self._scrape_movie_traits(movie_container),
-                    self._scrape_movie_schedule(movie_container),
-                ],
+            self._scrape_movie_title(movie_container): self._normalize_movie(
+                movie
             )
         }
+
+    @abstractmethod
+    def _normalize_movie(self, movie):
+        return
 
     @abstractmethod
     def scrape(self):

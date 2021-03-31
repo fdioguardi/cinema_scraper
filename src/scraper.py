@@ -1,4 +1,6 @@
 from functools import reduce
+from cinema import CinemaLaPlataScrappy
+from cinepolis import CinepolisScrappy
 
 
 class Scrapper:
@@ -11,9 +13,16 @@ class Scrapper:
     def __init__(self):
         self.scrapies = []
 
-    def add(self, scrapy):
+    def add(self, *args):
         """Add a Scrappy to the list of scrapies"""
-        self.scrapies.append(scrapy)
+        for scrapy in args:
+            self.scrapies.append(scrapy)
+
+        return self
+
+    @classmethod
+    def setup(cls):
+        return cls().add(CinemaLaPlataScrappy(), CinepolisScrappy())
 
     def _difference(self, dictionary, intersection):
         return {
@@ -21,22 +30,52 @@ class Scrapper:
             for key in set(dictionary.keys()).difference(intersection)
         }
 
-    def _merge_movies(self, x, y):
-        # TODO: mergear como la gente
-        return dict(x, **y)
+    def _merge_movies(self, a_movie, a_source, b_movie, b_source):
+
+        shared_keys = set(a_movie.keys()).intersection(set(b_movie.keys()))
+
+        movie = dict(
+            self._difference(a_movie, shared_keys),
+            **self._difference(b_movie, shared_keys)
+        )
+
+        a_data = {}
+        b_data = {}
+
+        for key in shared_keys:
+            if a_movie[key] == b_movie[key]:
+                movie[key] = a_movie[key]
+            else:
+                a_data[key] = a_movie[key]
+                b_data[key] = b_movie[key]
+
+        movie[a_source] = a_data
+        movie[b_source] = b_data
+
+        return movie
 
     def _merge(self, a, b):
-        """Merge 2 dictionaries 'a' and 'b' containing movie data"""
+        """a and b are tuples. First element are movies, second is source of
+        info. Merge movies from a and b"""
 
-        shared_movies = set(a.keys()).intersection(set(b.keys()))
+        a_movies, a_source = a
+        b_movies, b_source = b
+
+        shared_movies = set(a_movies.keys()).intersection(set(b_movies.keys()))
 
         movies = dict(
-            self._difference(a, shared_movies),
-            **self._difference(b, shared_movies)
+            self._difference(a_movies, shared_movies),
+            **self._difference(b_movies, shared_movies)
         )
 
         for movie in shared_movies:
-            movies.update({ movie: self._merge_movies(a[movie], b[movie]) })
+            movies.update(
+                {
+                    movie: self._merge_movies(
+                        a_movies[movie], a_source, b_movies[movie], b_source
+                    )
+                }
+            )
 
         return movies
 
@@ -49,9 +88,4 @@ class Scrapper:
         )
 
 
-# from cinema import CinemaLaPlataScrappy
-
-# x = Scrapper()
-# x.add(CinemaLaPlataScrappy())
-# x.add(CinemaLaPlataScrappy())
-# print(x.scrape())
+print(Scrapper.setup().scrape())

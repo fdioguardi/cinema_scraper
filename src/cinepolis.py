@@ -76,24 +76,25 @@ class CinepolisScrappy(CinemaScrappy):
             EC.text_to_be_present_in_element((By.ID, "tecnicos"), "Título")
         )
 
-    def _scrape_movie_traits(self, movie_driver):
+    def _collect_movie_traits(self, movie_driver):
         movie_driver.find_element_by_id("tecnicos-tab").click()
         self._wait_for_traits(movie_driver)
 
-        movie = {}
-        for trait in movie_driver.find_element_by_id("tecnicos").text.split(
-            "\n"
-        ):
-            try:
-                key, value = trait.split(": ", 1)
-                movie[key] = value
-            except ValueError:
-                pass
+        traits = {}
+        try:
+            for trait in movie_driver.find_element_by_id("tecnicos").text.split(
+                "\n"
+            ):
+                    key, value = trait.split(": ", 1)
+                    traits[key] = value
+        except ValueError:
+            pass
 
-        for trait in ["Actores", "Género"]:
-            if trait in movie.keys():
-                movie[trait] = movie[trait].split(", ")
+        return traits, ", "
 
+    def _normalize_movie(self, movie):
+        if "Duración" in movie.keys():
+            movie["Duración"] = movie["Duración"][:-1] + "utos."
         return movie
 
     def scrape(self):
@@ -112,4 +113,4 @@ class CinepolisScrappy(CinemaScrappy):
             except TimeoutException:
                 pass
 
-        return movie
+        return movies, "Cinepolis"
