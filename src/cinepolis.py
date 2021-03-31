@@ -1,5 +1,9 @@
+from abstract_cinema import CinemaScrappy
 from selenium import webdriver
-from cinema import CinemaScrappy
+from selenium.common.exceptions import TimeoutException
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.support.ui import WebDriverWait
 
 
 class CinepolisScrappy(CinemaScrappy):
@@ -22,60 +26,90 @@ class CinepolisScrappy(CinemaScrappy):
         )
 
     def _scrape_movie_title(self, driver):
-        return driver.find_element_by_class_name("title-text").text.strip().upper()
+        return (
+            driver.find_element_by_class_name("title-text")
+            .text.strip()
+            .upper()
+        )
 
     def _scrape_cinema_name(self, cinema):
         return cinema.find_element_by_class_name("btn-link").text.strip()
 
     def _scrape_movie_auditorium_and_schedule(self, cinema):
-        data = {}
-        for combination in cinema.find_elements_by_class_name("movie-showtimes-component-combination"):
-            data[combination.find_element_by_class_name("text-uppercase").text.strip()] = [
-                a.text for a in combination.find_elements_by_tag_name("a")]
-        return data
+        return {
+            combination.find_element_by_class_name(
+                "text-uppercase"
+            ).text.strip(): [
+                anchor.text for anchor in combination.find_elements_by_tag_name("a")
+            ]
+            for combination in cinema.find_elements_by_class_name(
+                "movie-showtimes-component-combination"
+            )
+        }
 
     def _scrape_movie_schedule(self, driver):
-        schedule_data = {}
         schedule_tab = driver.find_element_by_class_name(
-            "movie-detail-showtimes-component")
-        for cinema in schedule_tab.find_elements_by_class_name("panel-primary"):
+            "movie-detail-showtimes-component"
+        )
+
+        schedule_data = {}
+        for cinema in schedule_tab.find_elements_by_class_name(
+            "panel-primary"
+        ):
             cinema.click()
-            schedule_data[self._scrape_cinema_name(
-                cinema)] = self._scrape_movie_auditorium_and_schedule(cinema)
-        return { "Horarios": schedule_data}
+            schedule_data[
+                self._scrape_cinema_name(cinema)
+            ] = self._scrape_movie_auditorium_and_schedule(cinema)
+        return {"Horarios": schedule_data}
 
-    def _scrape_movie(self, movie_driver):
-        movie_data = {}
+    def _scrape_movie_synopsis(self, movie_driver):
+        return {
+            "Sinopsis": movie_driver.find_element_by_id(
+                "sinopsis"
+            ).text.strip()
+        }
 
-        movie_data["Sinopsis"] = movie_driver.find_element_by_id(
-            "sinopsis").text.strip()
+    def _wait_for_traits(self, movie_driver, timeout=10):
+        """Wait 'timeout' seconds for traits to load. Else explode"""
 
+        return WebDriverWait(movie_driver, timeout).until(
+            EC.text_to_be_present_in_element((By.ID, "tecnicos"), "Título")
+        )
+
+    def _scrape_movie_traits(self, movie_driver):
         movie_driver.find_element_by_id("tecnicos-tab").click()
+        self._wait_for_traits(movie_driver)
 
-        for data in movie_driver.find_element_by_id("tecnicos").text.split("\n"):
-            aux = data.split(": ")
-            if aux[0] == "Actores" or aux[0] == "Género":
-                movie_data[aux[0]] = aux[1].split(", ")
-            else:
-                movie_data[aux[0]] = aux[1]
+        movie = {}
+        for trait in movie_driver.find_element_by_id("tecnicos").text.split(
+            "\n"
+        ):
+            try:
+                key, value = trait.split(": ", 1)
+                movie[key] = value
+            except ValueError:
+                pass
 
-        movie_data.update(self._scrape_movie_schedule(movie_driver))
+        for trait in ["Actores", "Género"]:
+            if trait in movie.keys():
+                movie[trait] = movie[trait].split(", ")
 
-        return {self._scrape_movie_title(movie_driver): movie_data}
+        return movie
 
     def scrape(self):
-        """
-        Extract information from Cinepolis' billboard
-        """
+        """Extract information from Cinepolis' billboard"""
         movies = {}
         driver = self.chromium_driver()
         driver.get(self._cinema_page)
         movie_container = driver.find_element_by_class_name("movie-grid")
-        for movie in [m.get_attribute("href") for m in movie_container.find_elements_by_tag_name("a")]:
-            driver.get(movie)
-            movies.update(self._scrape_movie(driver))
-        print(movies)
+        for movie in [
+            m.get_attribute("href")
+            for m in movie_container.find_elements_by_tag_name("a")
+        ]:
+            try:
+                driver.get(movie)
+                movies.update(self.scrape_movie(driver))
+            except TimeoutException:
+                pass
 
-
-CinepolisScrappy(
-    browser_executable=r"C:\Program Files\BraveSoftware\Brave-Browser\Application\brave.exe").scrape()
+        return movie

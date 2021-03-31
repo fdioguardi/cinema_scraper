@@ -1,22 +1,6 @@
-from abc import ABC, abstractmethod
+from abstract_cinema import CinemaScrappy
 from bs4 import BeautifulSoup
 import requests
-
-
-class CinemaScrappy(ABC):
-    """Abstract scrapper for cinema pages
-
-    _cinema_page (string) -- link to fetch for movies
-    """
-
-    def __init__(self, _cinema_page):
-        self._cinema_page = _cinema_page
-
-    @abstractmethod
-    def scrape(self):
-        """Fetch movies' info in _cinema_page, return a list """
-
-        return
 
 
 class CinemaLaPlataScrappy(CinemaScrappy):
@@ -39,7 +23,10 @@ class CinemaLaPlataScrappy(CinemaScrappy):
 
     def _scrape_movie_title(self, movie_container):
         return (
-            movie_container.find("div", class_="page-title").get_text().strip().upper()
+            movie_container.find("div", class_="page-title")
+            .get_text()
+            .strip()
+            .upper()
         )
 
     def _scrape_movie_traits(self, movie_container):
@@ -48,6 +35,13 @@ class CinemaLaPlataScrappy(CinemaScrappy):
             for trait in movie_container.find_all(
                 "div", attrs={"class": "dropcap6"}
             )
+        }
+
+    def _scrape_movie_synopsis(self, movie_container):
+        return {
+            "Sinopsis": movie_container.find(id="ctl00_cph_lblSinopsis")
+            .get_text()
+            .strip()
         }
 
     def _scrape_movie_schedule(self, movie_container):
@@ -67,18 +61,9 @@ class CinemaLaPlataScrappy(CinemaScrappy):
             }
         }
 
-    def _scrape_movie(self, movie_link):
+    def scrape_movie(self, movie_link):
         movie_container = self._make_soup(self._cinema_page + movie_link)
-
-        movie = self._scrape_movie_traits(movie_container)
-
-        movie["Sinopsis"] = (
-            movie_container.find(id="ctl00_cph_lblSinopsis").get_text().strip()
-        )
-
-        movie.update(self._scrape_movie_schedule(movie_container))
-
-        return {self._scrape_movie_title(movie_container): movie}
+        super.scrape_movie(movie_container)
 
     def scrape(self):
         """
@@ -90,5 +75,5 @@ class CinemaLaPlataScrappy(CinemaScrappy):
 
         movies = {}
         for movie in movies_container:
-            movies.update(self._scrape_movie(movie.a.get("href")))
+            movies.update(self.scrape_movie(movie.a.get("href")))
         return movies
