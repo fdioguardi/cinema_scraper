@@ -90,7 +90,17 @@ class CinepolisScrappy(CinemaScrappy):
         except ValueError:
             pass
 
-        return traits, ", "
+        return traits
+
+    def _split_string_trait(self, traits, trait, separator):
+        if trait in traits.keys():
+            traits[trait] = traits[trait].split(separator)
+        return traits
+
+    def _separate_movie_traits(self, traits):
+        for trait in ["Actores", "Género"]:
+            traits = self._split_string_trait(traits, trait, ", ")
+        return traits
 
     def _normalize_movie(self, movie):
         if "Duración" in movie.keys():
