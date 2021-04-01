@@ -35,7 +35,12 @@ class CinemaLaPlataScrappy(CinemaScrappy):
             for trait in movie_container.find_all(
                 "div", attrs={"class": "dropcap6"}
             )
-        }, "/"
+        }
+
+    def _separate_movie_traits(self, traits):
+        return self._split_string_trait(
+            self._split_string_trait(traits, "Género", "/"), "Actores", ", "
+        )
 
     def _scrape_movie_synopsis(self, movie_container):
         return {
@@ -62,8 +67,9 @@ class CinemaLaPlataScrappy(CinemaScrappy):
         }
 
     def scrape_movie(self, movie_link):
-        movie_container = self._make_soup(self._cinema_page + movie_link)
-        return super().scrape_movie(movie_container)
+        return super().scrape_movie(
+            self._make_soup(self._cinema_page + movie_link)
+        )
 
     def _normalize_movie(self, movie):
         normalized_keys = {
