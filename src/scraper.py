@@ -1,4 +1,5 @@
 from functools import reduce
+from json import dump
 from cinema import CinemaLaPlataScrappy
 from cinepolis import CinepolisScrappy
 
@@ -79,13 +80,16 @@ class Scrapper:
 
         return movies
 
-    def scrape(self):
+    def scrape(self, path="../data/movies.json"):
         if len(self.scrapies) < 2:
-            return self.scrapies[0].scrape()
+            movies = self.scrapies[0].scrape()
+        else:
+            movies = reduce(
+                self._merge, [scrapy.scrape() for scrapy in self.scrapies]
+            )
 
-        return reduce(
-            self._merge, [scrapy.scrape() for scrapy in self.scrapies]
-        )
+        with open(path, "w") as file:
+            dump(movies, file, ensure_ascii=False, indent=4, sort_keys=True)
 
 
-print(Scrapper.setup().scrape())
+Scrapper.setup().scrape()
