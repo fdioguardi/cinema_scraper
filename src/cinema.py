@@ -1,12 +1,18 @@
-from abstract_cinema import CinemaScrappy
+from abstract_cinema import CinemaScrapy
 from bs4 import BeautifulSoup
 import requests
 
 
-class CinemaLaPlataScrappy(CinemaScrappy):
-    """Scrapper of Cinema La Plata's billboard"""
+class CinemaLaPlataScrapy(CinemaScrapy):
+    """Scraper of Cinema La Plata's billboard
+
+    Args:
+        CinemaScrapy ([type]): [description]
+    """
 
     def __init__(self):
+        """[summary]
+        """
         super().__init__(_cinema_page="http://www.cinemalaplata.com/")
 
     def _make_soup(self, link):
@@ -22,6 +28,14 @@ class CinemaLaPlataScrappy(CinemaScrappy):
         return BeautifulSoup(requests.get(link).text, "html.parser")
 
     def _scrape_movie_title(self, movie_container):
+        """[summary]
+
+        Args:
+            movie_container ([type]): [description]
+
+        Returns:
+            [type]: [description]
+        """
         return (
             movie_container.find("div", class_="page-title")
             .get_text()
@@ -30,6 +44,14 @@ class CinemaLaPlataScrappy(CinemaScrappy):
         )
 
     def _collect_movie_traits(self, movie_container):
+        """[summary]
+
+        Args:
+            movie_container ([type]): [description]
+
+        Returns:
+            [type]: [description]
+        """
         return {
             trait.h4.get_text().strip(): trait.span.get_text().strip()
             for trait in movie_container.find_all(
@@ -38,11 +60,27 @@ class CinemaLaPlataScrappy(CinemaScrappy):
         }
 
     def _separate_movie_traits(self, traits):
+        """[summary]
+
+        Args:
+            traits ([type]): [description]
+
+        Returns:
+            [type]: [description]
+        """
         return self._split_string_trait(
             self._split_string_trait(traits, "Género", "/"), "Actores", ", "
         )
 
     def _scrape_movie_synopsis(self, movie_container):
+        """[summary]
+
+        Args:
+            movie_container ([type]): [description]
+
+        Returns:
+            [type]: [description]
+        """
         return {
             "Sinopsis": movie_container.find(id="ctl00_cph_lblSinopsis")
             .get_text()
@@ -50,6 +88,14 @@ class CinemaLaPlataScrappy(CinemaScrappy):
         }
 
     def _scrape_movie_schedule(self, movie_container):
+        """[summary]
+
+        Args:
+            movie_container ([type]): [description]
+
+        Returns:
+            [type]: [description]
+        """
         schedule_container = movie_container.find(
             "div", attrs={"id": "ctl00_cph_pnFunciones"}
         )
@@ -67,11 +113,27 @@ class CinemaLaPlataScrappy(CinemaScrappy):
         }
 
     def scrape_movie(self, movie_link):
+        """[summary]
+
+        Args:
+            movie_link ([type]): [description]
+
+        Returns:
+            [type]: [description]
+        """
         return super().scrape_movie(
             self._make_soup(self._cinema_page + movie_link)
         )
 
     def _trim_trailing_points(self, movie):
+        """[summary]
+
+        Args:
+            movie ([type]): [description]
+
+        Returns:
+            [type]: [description]
+        """
 
         if movie["Actores"][-1][-1] == ".":
             movie["Actores"][-1] = movie["Actores"][-1][:-1]
@@ -81,11 +143,16 @@ class CinemaLaPlataScrappy(CinemaScrappy):
                 movie[trait] = movie[trait][:-1]
 
         return movie
-        if movie["Duración"][-1] == ".":
-            movie["Duración"] = movie["Duración"][:-1]
-
 
     def _normalize_movie(self, movie):
+        """[summary]
+
+        Args:
+            movie ([type]): [description]
+
+        Returns:
+            [type]: [description]
+        """
         normalized_keys = {
             "Calificacion": "Calificación",
             "Duracion": "Duración",
@@ -97,8 +164,10 @@ class CinemaLaPlataScrappy(CinemaScrappy):
         return self._trim_trailing_points(movie)
 
     def scrape(self):
-        """
-        Extract information from Cinema La Plata's billboard
+        """[summary]
+
+        Returns:
+            [type]: [description]
         """
         movies_container = self._make_soup(
             self._cinema_page + "Cartelera.aspx"

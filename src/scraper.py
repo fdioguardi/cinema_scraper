@@ -1,23 +1,46 @@
 from functools import reduce
 from json import dump
-from cinema import CinemaLaPlataScrappy
-from cinepolis import CinepolisScrappy
+from cinema import CinemaLaPlataScrapy
+from cinepolis import CinepolisScrapy
 
 
-class Scrapper:
+class Scraper:
     def __init__(self):
-        self.scrapies = [
-            CinemaLaPlataScrappy(),
-            CinepolisScrappy(),
+        """Initialize the scraper with two scrapys
+        """
+        self.scrapys = [
+            CinemaLaPlataScrapy(),
+            CinepolisScrapy(),
         ]
 
     def _difference(self, dictionary, intersection):
+        """This method returns a dictionary without the intersected keys
+
+        Args:
+            dictionary (dict): A movie
+            intersection (set): Shared keys
+
+        Returns:
+            dict: dictionary without the intersected keys
+        """
         return {
             key: dictionary[key]
             for key in set(dictionary.keys()).difference(intersection)
         }
 
     def _merge_keys(self, movie, shared_keys, a_movie, b_movie):
+        """This method merges information from specific keys
+
+        Args:
+            movie (dict): Movie's not shared data
+            shared_keys (list): List of keys shared by a_movie and b_movie
+            a_movie (dict): Movie's data
+            b_movie (dict): Another Movie's data
+
+        Returns:
+            tuple(dict, list): first element represents the movie with the merged data and second element represents 
+                the new list of shared keys
+        """
         for key in ["Actores", "Género"]:
             if key in shared_keys:
                 movie[key] = list(set(a_movie[key] + b_movie[key]))
@@ -26,9 +49,21 @@ class Scrapper:
         if "Horarios" in shared_keys:
             movie["Horarios"] = {**a_movie["Horarios"], **b_movie["Horarios"]}
             shared_keys.remove("Horarios")
+
         return movie, shared_keys
 
     def _merge_movies(self, a_movie, a_source, b_movie, b_source):
+        """This method merges the information of two movies
+
+        Args:
+            a_movie (dict): Movie's data
+            a_source (str): Movie's data source
+            b_movie (dict): Another movie's data
+            b_source (str): Another movie's data Source 
+
+        Returns:
+            dict: Merged movie data
+        """
 
         shared_keys = set(a_movie.keys()).intersection(set(b_movie.keys()))
 
@@ -59,8 +94,15 @@ class Scrapper:
         return movie
 
     def _merge(self, a, b):
-        """a and b are tuples. First element are movies, second is source of
-        info. Merge movies from a and b"""
+        """This method recieves two tuples and merges the information within their dictionaries respecting their source
+
+        Args:
+            a (Tuple): This tuple contains a dictionary of movies and the source of it's information
+            b (Tuple): This tuple contains a dictionary of movies and the source of it's information
+
+        Returns:
+            [Dict]: A dictionary with merged movies
+        """
 
         a_movies, a_source = a
         b_movies, b_source = b
@@ -84,10 +126,15 @@ class Scrapper:
         return movies
 
     def scrape(self, path="../data/movies.json"):
+        """This method starts the scraping of both pages and saves the gathered data into the recieved path
+
+        Args:
+            path (str, optional): path to save the information in. Defaults to "../data/movies.json".
+        """
         with open(path, "w") as file:
             dump(
                 self._merge(
-                    *map(lambda scrapy: scrapy.scrape(), self.scrapies)
+                    *map(lambda scrapy: scrapy.scrape(), self.scrapys)
                 ),
                 file,
                 ensure_ascii=False,
