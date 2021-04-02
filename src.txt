@@ -1,4 +1,7 @@
-x = Scrapper()
-x.add(CinemaLaPlataScrappy())
-x.add(CinepolisScrappy())
-x.scrap()
+Paso 1: En el archivo `cinepolis.py` se encuentra la clase `CinepolisScraper`. El método __init__ define el path al driver a utilizar (por defecto chromedriver), y el path al ejecutable del browser a utilizar (por defecto Brave, en un sistema Linux). El script debería funcionar para navegadores con motores chromium, como Google Chrome, y Brave. Para usar otro navegador se tiene que modificar el método `driver()` de esa misma clase.
+
+Paso 2: En el archivo `scraper.py` se encuentra la clase Scraper. Importar, y ejecutar el método de instancia `scrape()` de la siguiente manera:
+
+```python
+Scrapper().scrape()
+```

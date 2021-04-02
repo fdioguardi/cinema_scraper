@@ -18,7 +18,7 @@ class CinepolisScrappy(CinemaScrappy):
         self.browser_executable = browser_executable
         self.driver_executable = driver_executable
 
-    def chromium_driver(self):
+    def driver(self):
         options = webdriver.ChromeOptions()
         options.binary_location = self.browser_executable
         return webdriver.Chrome(
@@ -104,13 +104,13 @@ class CinepolisScrappy(CinemaScrappy):
 
     def _normalize_movie(self, movie):
         if "Duración" in movie.keys():
-            movie["Duración"] = movie["Duración"][:-1] + "utos."
+            movie["Duración"] = movie["Duración"][:-1] + "utos"
         return movie
 
     def scrape(self):
         """Extract information from Cinepolis' billboard"""
         movies = {}
-        driver = self.chromium_driver()
+        driver = self.driver()
         driver.get(self._cinema_page)
         movie_container = driver.find_element_by_class_name("movie-grid")
         for movie in [

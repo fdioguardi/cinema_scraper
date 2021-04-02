@@ -5,25 +5,11 @@ from cinepolis import CinepolisScrappy
 
 
 class Scrapper:
-    """
-    Frontend to different cinema scrapers
-
-    @scrapies -- specialized scrapers (list)
-    """
-
     def __init__(self):
-        self.scrapies = []
-
-    def add(self, *args):
-        """Add a Scrappy to the list of scrapies"""
-        for scrapy in args:
-            self.scrapies.append(scrapy)
-
-        return self
-
-    @classmethod
-    def setup(cls):
-        return cls().add(CinemaLaPlataScrappy(), CinepolisScrappy())
+        self.scrapies = [
+            CinemaLaPlataScrappy(),
+            CinepolisScrappy(),
+        ]
 
     def _difference(self, dictionary, intersection):
         return {
@@ -31,13 +17,29 @@ class Scrapper:
             for key in set(dictionary.keys()).difference(intersection)
         }
 
+    def _merge_keys(self, movie, shared_keys, a_movie, b_movie):
+        for key in ["Actores", "Género"]:
+            if key in shared_keys:
+                movie[key] = list(set(a_movie[key] + b_movie[key]))
+                shared_keys.remove(key)
+
+        if "Horarios" in shared_keys:
+            movie["Horarios"] = {**a_movie["Horarios"], **b_movie["Horarios"]}
+            shared_keys.remove("Horarios")
+        return movie, shared_keys
+
     def _merge_movies(self, a_movie, a_source, b_movie, b_source):
 
         shared_keys = set(a_movie.keys()).intersection(set(b_movie.keys()))
 
-        movie = dict(
-            self._difference(a_movie, shared_keys),
-            **self._difference(b_movie, shared_keys)
+        movie, shared_keys = self._merge_keys(
+            dict(
+                self._difference(a_movie, shared_keys),
+                **self._difference(b_movie, shared_keys)
+            ),
+            shared_keys,
+            a_movie,
+            b_movie,
         )
 
         a_data = {}
@@ -50,8 +52,9 @@ class Scrapper:
                 a_data[key] = a_movie[key]
                 b_data[key] = b_movie[key]
 
-        movie[a_source] = a_data
-        movie[b_source] = b_data
+        if a_data:
+            movie[a_source] = a_data
+            movie[b_source] = b_data
 
         return movie
 
@@ -81,15 +84,13 @@ class Scrapper:
         return movies
 
     def scrape(self, path="../data/movies.json"):
-        if len(self.scrapies) < 2:
-            movies = self.scrapies[0].scrape()
-        else:
-            movies = reduce(
-                self._merge, [scrapy.scrape() for scrapy in self.scrapies]
-            )
-
         with open(path, "w") as file:
-            dump(movies, file, ensure_ascii=False, indent=4, sort_keys=True)
-
-
-Scrapper.setup().scrape()
+            dump(
+                self._merge(
+                    *map(lambda scrapy: scrapy.scrape(), self.scrapies)
+                ),
+                file,
+                ensure_ascii=False,
+                indent=4,
+                sort_keys=True,
+            )

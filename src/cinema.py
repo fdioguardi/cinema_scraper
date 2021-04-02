@@ -71,6 +71,20 @@ class CinemaLaPlataScrappy(CinemaScrappy):
             self._make_soup(self._cinema_page + movie_link)
         )
 
+    def _trim_trailing_points(self, movie):
+
+        if movie["Actores"][-1][-1] == ".":
+            movie["Actores"][-1] = movie["Actores"][-1][:-1]
+
+        for trait in ["Director", "Duración"]:
+            if movie[trait][-1] == ".":
+                movie[trait] = movie[trait][:-1]
+
+        return movie
+        if movie["Duración"][-1] == ".":
+            movie["Duración"] = movie["Duración"][:-1]
+
+
     def _normalize_movie(self, movie):
         normalized_keys = {
             "Calificacion": "Calificación",
@@ -80,7 +94,7 @@ class CinemaLaPlataScrappy(CinemaScrappy):
         for key, normalized_key in normalized_keys.items():
             movie[normalized_key] = movie.pop(key)
 
-        return movie
+        return self._trim_trailing_points(movie)
 
     def scrape(self):
         """
