@@ -234,4 +234,5 @@ class CinepolisScrapy(CinemaScrapy):
             except TimeoutException:
                 pass
 
+        driver.quit()
         return movies, "Cinepolis"

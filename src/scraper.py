@@ -1,4 +1,6 @@
+from os.path import join, isdir
 from functools import reduce
+from datetime import datetime
 from json import dump
 from cinema import CinemaLaPlataScrapy
 from cinepolis import CinepolisScrapy
@@ -6,8 +8,7 @@ from cinepolis import CinepolisScrapy
 
 class Scraper:
     def __init__(self):
-        """Initialize the scraper with two scrapies
-        """
+        """Initialize the scraper with two scrapies"""
         self.scrapies = [
             CinemaLaPlataScrapy(),
             CinepolisScrapy(),
@@ -127,15 +128,23 @@ class Scraper:
 
         return movies
 
-    def scrape(self, path="../data/movies.json"):
+    def scrape(self, path="../data/"):
         """This method starts the scraping of both pages and saves the
             gathered data into the recieved path
 
         Args:
             path (optional[str]): path to save the information in.
-                Defaults to "../data/movies.json".
+                Defaults to "../data/".
         """
-        with open(path, "w") as file:
+        with open(
+            join(
+                path,
+                "movies_"
+                + datetime.today().strftime("%Y-%m-%d-%H:%M:%S")
+                + ".json",
+            ),
+            "w",
+        ) as file:
             dump(
                 self._merge(
                     *map(lambda scrapy: scrapy.scrape(), self.scrapies)
