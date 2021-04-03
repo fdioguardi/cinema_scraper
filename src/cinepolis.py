@@ -216,8 +216,8 @@ class CinepolisScrapy(CinemaScrapy):
         driver.get(self._cinema_page)
         movie_container = driver.find_element_by_class_name("movie-grid")
         for movie in [
-            m.get_attribute("href")
-            for m in movie_container.find_elements_by_tag_name("a")
+            anchor.get_attribute("href")
+            for anchor in movie_container.find_elements_by_tag_name("a")
         ]:
             try:
                 driver.get(movie)
