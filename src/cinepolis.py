@@ -8,31 +8,27 @@ from selenium.webdriver.support.ui import WebDriverWait
 
 class CinepolisScrapy(CinemaScrapy):
     """Scrapper of Cinepolis's billboard
-
-    Args:
-        CinemaScrapy ([type]): [description]
+    
+        driver_executable (str): path to browser's driver
+        browser_executable (str): path to the user's browser.exe
     """
 
-    def __init__(
-        self,
-        driver_executable="chromedriver",
-        browser_executable="/usr/bin/brave",
-    ):
-        """[summary]
+    def __init__(self, driver_executable="chromedriver", browser_executable="/usr/bin/brave"):
+        """This method initialize the scrapy
 
         Args:
-            driver_executable (str, optional): [description]. Defaults to "chromedriver".
-            browser_executable (str, optional): [description]. Defaults to "/usr/bin/brave".
+            driver_executable (str, optional): This is the path to the user navigator driver. Defaults to "chromedriver".
+            browser_executable (str, optional): This is the path to the user's browser's executable. Defaults to "/usr/bin/brave".
         """
         super().__init__(_cinema_page="http://www.villagecines.com/")
         self.browser_executable = browser_executable
         self.driver_executable = driver_executable
 
     def driver(self):
-        """[summary]
+        """This method creates an instance of WebDriver
 
         Returns:
-            [type]: [description]
+            WebDriver: Driver to navigate throw internet like a person
         """
         options = webdriver.ChromeOptions()
         options.binary_location = self.browser_executable
@@ -41,13 +37,13 @@ class CinepolisScrapy(CinemaScrapy):
         )
 
     def _scrape_movie_title(self, driver):
-        """[summary]
+        """This method scraps the title of a movie
 
         Args:
-            driver ([type]): [description]
+            driver (WebDriver): Web container of the movie
 
         Returns:
-            [type]: [description]
+            str: title of a movie
         """
         return (
             driver.find_element_by_class_name("title-text")
@@ -56,24 +52,24 @@ class CinepolisScrapy(CinemaScrapy):
         )
 
     def _scrape_cinema_name(self, cinema):
-        """[summary]
+        """ This method obtains the cinema's name
 
         Args:
-            cinema ([type]): [description]
+            cinema (WebElement): Web element with a cinema's name
 
         Returns:
-            [type]: [description]
+            str: cinema's name
         """
         return cinema.find_element_by_class_name("btn-link").text.strip()
 
     def _scrape_movie_auditorium_and_schedule(self, cinema):
-        """[summary]
+        """This method obtains a dictionary with cinema's name and it's showtimes schedule
 
         Args:
-            cinema ([type]): [description]
+            cinema (WebbElement): Web element with a cinemas schedule data
 
         Returns:
-            [type]: [description]
+            dict: auditorium as key and schedule as value
         """
         return {
             combination.find_element_by_class_name(
@@ -87,13 +83,13 @@ class CinepolisScrapy(CinemaScrapy):
         }
 
     def _scrape_movie_schedule(self, driver):
-        """[summary]
+        """This method obtains a movie's schedule
 
         Args:
-            driver ([type]): [description]
+            movie_container (WebDriver): Web container of the movie
 
         Returns:
-            [type]: [description]
+            dict: Movie with schedule data
         """
         schedule_tab = driver.find_element_by_class_name(
             "movie-detail-showtimes-component"
@@ -110,13 +106,13 @@ class CinepolisScrapy(CinemaScrapy):
         return {"Horarios": schedule_data}
 
     def _scrape_movie_synopsis(self, movie_driver):
-        """[summary]
+        """This method scraps the synopsis of a movie
 
         Args:
-            movie_driver ([type]): [description]
-
+            movie_container (WebDriver): Web container of the movie
+        
         Returns:
-            [type]: [description]
+            dict:  Dictionary with "Sinopsis" as key and a movie sinopsis as value
         """
         return {
             "Sinopsis": movie_driver.find_element_by_id(
@@ -125,29 +121,29 @@ class CinepolisScrapy(CinemaScrapy):
         }
 
     def _wait_for_traits(self, movie_driver, timeout=10):
-        """[summary]
+        """Wait 'timeout' seconds for traits to load. Else explode
 
         Args:
-            movie_driver ([type]): [description]
-            timeout (int, optional): [description]. Defaults to 10.
+            movie_driver (WebDriver): Movie's data container
+            timeout (int, optional): time in second, to wait for tha page to do something. Defaults to 10.
+        
+        Raises:
 
-        Returns:
-            [type]: [description]
         """
-        """Wait 'timeout' seconds for traits to load. Else explode"""
 
-        return WebDriverWait(movie_driver, timeout).until(
+        WebDriverWait(movie_driver, timeout).until(
             EC.text_to_be_present_in_element((By.ID, "tecnicos"), "Título")
         )
 
     def _collect_movie_traits(self, movie_driver):
-        """[summary]
+        """This method fetches the traits of a movie from the movie
+            container
 
         Args:
-            movie_driver ([type]): [description]
+            movie_container (WebDriver): Web container of the movie
 
         Returns:
-            [type]: [description]
+            dict: Collected traits of a movie
         """
         movie_driver.find_element_by_id("tecnicos-tab").click()
         self._wait_for_traits(movie_driver)
@@ -165,51 +161,54 @@ class CinepolisScrapy(CinemaScrapy):
         return traits
 
     def _split_string_trait(self, traits, trait, separator):
-        """[summary]
+        """This method splits a string in 'traits' with key 'trait' by
+            'separator', replacing the original string with a list.
 
         Args:
-            traits ([type]): [description]
-            trait ([type]): [description]
-            separator ([type]): [description]
+            traits (dict): Traits of a movie
+            trait (str): Movie trait representing a list
+            separator (str): Separator of the trait's list
 
         Returns:
-            [type]: [description]
+            dict: Traits of a movie
         """
         if trait in traits.keys():
             traits[trait] = traits[trait].split(separator)
         return traits
 
     def _separate_movie_traits(self, traits):
-        """[summary]
+        """This methods splits every list-like string in 'traits' that's
+            considered fitting
 
         Args:
-            traits ([type]): [description]
+            traits (dict): Traits of a movie
 
         Returns:
-            [type]: [description]
+            dict: Traits of a movie with reformatted keys
         """
         for trait in ["Actores", "Género"]:
             traits = self._split_string_trait(traits, trait, ", ")
         return traits
 
     def _normalize_movie(self, movie):
-        """[summary]
+        """This method normalizes a movie's data
 
         Args:
-            movie ([type]): [description]
+            movie (dict): A movie data
 
         Returns:
-            [type]: [description]
+            dict: Normalized movie data
         """
         if "Duración" in movie.keys():
             movie["Duración"] = movie["Duración"][:-1] + "utos"
         return movie
 
     def scrape(self):
-        """[summary]
+        """This method starts the scrapping of a cinepolis's billboard page
 
         Returns:
-            [type]: [description]
+            dict: Data of movies
+            str: Source of data
         """
         movies = {}
         driver = self.driver()

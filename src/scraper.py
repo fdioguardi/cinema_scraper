@@ -17,8 +17,8 @@ class Scraper:
         """This method returns a dictionary without the intersected keys
 
         Args:
-            dictionary (dict) -- A movie
-            intersection (set) -- Shared keys
+            dictionary (dict): A movie
+            intersection (set): Shared keys
 
         Returns:
             dict: dictionary without the intersected keys
@@ -32,13 +32,13 @@ class Scraper:
         """This method merges information from specific keys
 
         Args:
-            movie (dict) -- Movie's not shared data
-            shared_keys (list) -- Keys shared by a_movie and b_movie
-            a_movie (dict) -- A movie's data
-            b_movie (dict) -- Another movie's data
+            movie (dict): Movie's not shared data
+            shared_keys (list): Keys shared by a_movie and b_movie
+            a_movie (dict): A movie's data
+            b_movie (dict): Another movie's data
 
         Returns:
-            tuple(dict, list) -- contains the movie with the merged data
+            tuple(dict, list): contains the movie with the merged data
                 and the new list of shared keys
         """
         for key in ["Actores", "Género"]:
@@ -56,13 +56,13 @@ class Scraper:
         """This method merges the information of two movies
 
         Args:
-            a_movie (dict) -- A movie's data
-            a_source (str) -- A movie's source of data
-            b_movie (dict) -- Another movie's data
-            b_source (str) -- Another movie's source of data
+            a_movie (dict): A movie's data
+            a_source (str): A movie's source of data
+            b_movie (dict): Another movie's data
+            b_source (str): Another movie's source of data
 
         Returns:
-            dict -- Merged movie's data
+            dict: Merged movie's data
         """
 
         shared_keys = set(a_movie.keys()).intersection(set(b_movie.keys()))
@@ -99,11 +99,11 @@ class Scraper:
             appropriate
 
         Args:
-            a (tuple(dict, str)) -- First dict of movies and its source
-            b (tuple(dict, str)) -- Second dict of movies and its source
+            a (tuple(dict, str)): First dict of movies and its source
+            b (tuple(dict, str)): Second dict of movies and its source
 
         Returns:
-            dict -- Merged movies
+            dict: Merged movies
         """
 
         a_movies, a_source = a
@@ -132,7 +132,7 @@ class Scraper:
             gathered data into the recieved path
 
         Args:
-            path (optional[str]) -- path to save the information in.
+            path (optional[str]): path to save the information in.
                 Defaults to "../data/movies.json".
         """
         with open(path, "w") as file:

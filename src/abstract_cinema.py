@@ -5,14 +5,14 @@ from functools import reduce
 class CinemaScrapy(ABC):
     """Abstract scraper for cinema pages
 
-    _cinema_page (str) -- Link to fetch for movies
+    _cinema_page (str): Link to fetch for movies
     """
 
     def __init__(self, _cinema_page):
         """This method performs a generic initialization of a Scrapy
 
         Args:
-            _cinema_page (str) -- Link to the main website to scrap.
+            _cinema_page (str): Link to the main website to scrap.
         """
         self._cinema_page = _cinema_page
 
@@ -21,10 +21,10 @@ class CinemaScrapy(ABC):
         """This method scraps the title of a movie
 
         Args:
-            movie_container (any) -- Web container of the movie
+            movie_container (any): Web container of the movie
 
         Returns:
-            [type]: [description]
+            str: title of a movie
         """
         return
 
@@ -33,7 +33,10 @@ class CinemaScrapy(ABC):
         """This method scraps the synopsis of a movie
 
         Args:
-            movie_container (any) -- Web container of the movie
+            movie_container (any): Web container of the movie
+        
+        Returns:
+            dict:  Dictionary with "Sinopsis" as key and a movie sinopsis as value
         """
         return
 
@@ -43,10 +46,10 @@ class CinemaScrapy(ABC):
             considered fitting
 
         Args:
-            traits (dict) -- Traits of a movie
+            traits (dict): Traits of a movie
 
         Returns:
-            dict -- Traits of a movie with reformatted keys
+            dict: Traits of a movie with reformatted keys
         """
         return
 
@@ -60,7 +63,7 @@ class CinemaScrapy(ABC):
             separator (str): Separator of the trait's list
 
         Returns:
-            dict -- Traits of a movie
+            dict: Traits of a movie
         """
         if trait in traits.keys():
             traits[trait] = traits[trait].split(separator)
@@ -72,10 +75,10 @@ class CinemaScrapy(ABC):
             container
 
         Args:
-            movie_container (any) -- Web container of the movie
+            movie_container (any): Web container of the movie
 
         Returns:
-            dict -- Collected traits of a movie
+            dict: Collected traits of a movie
         """
         return
 
@@ -83,10 +86,10 @@ class CinemaScrapy(ABC):
         """This method obtains the traits of a movie
 
         Args:
-            movie_container (any) -- Web container of the movie
+            movie_container (any): Web container of the movie
 
         Returns:
-            dict -- Traits of a movie
+            dict: Traits of a movie
         """
         return self._separate_movie_traits(
             self._collect_movie_traits(movie_container)
@@ -97,10 +100,10 @@ class CinemaScrapy(ABC):
         """This method obtains a movie's schedule
 
         Args:
-            movie_container (any) -- Web container of the movie
+            movie_container (any): Web container of the movie
 
         Returns:
-            dict -- Movie with schedule data
+            dict: Movie with schedule data
         """
         return
 

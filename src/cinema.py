@@ -4,11 +4,7 @@ import requests
 
 
 class CinemaLaPlataScrapy(CinemaScrapy):
-    """Scraper of Cinema La Plata's billboard
-
-    Args:
-        CinemaScrapy ([type]): [description]
-    """
+    """Scraper of Cinema La Plata's billboard"""
 
     def __init__(self):
         """This method initializes a Scrapy"""
@@ -28,13 +24,13 @@ class CinemaLaPlataScrapy(CinemaScrapy):
         return BeautifulSoup(requests.get(link).text, "html.parser")
 
     def _scrape_movie_title(self, movie_container):
-        """[summary]
+        """This method obtains the movie title
 
         Args:
-            movie_container ([type]): [description]
+            movie_container (BeautifulSoup): Movie's title container
 
         Returns:
-            [type]: [description]
+            str: Movie's title
         """
         return (
             movie_container.find("div", class_="page-title")
@@ -44,13 +40,13 @@ class CinemaLaPlataScrapy(CinemaScrapy):
         )
 
     def _collect_movie_traits(self, movie_container):
-        """[summary]
+        """This method collects the movie traits
 
         Args:
-            movie_container ([type]): [description]
+            movie_container (BeautifulSoup): Movie's data container
 
         Returns:
-            [type]: [description]
+            dict: Dictionary with all the movie traits
         """
         return {
             trait.h4.get_text().strip(): trait.span.get_text().strip()
@@ -60,13 +56,13 @@ class CinemaLaPlataScrapy(CinemaScrapy):
         }
 
     def _separate_movie_traits(self, traits):
-        """[summary]
+        """This method separates some of the movies traits
 
         Args:
-            traits ([type]): [description]
+            traits (dict): Movie traits
 
         Returns:
-            [type]: [description]
+            dict: Traits of a movie
         """
         return self._split_string_trait(
             self._split_string_trait(traits, "Género", "/"), "Actores", ", "
@@ -76,10 +72,10 @@ class CinemaLaPlataScrapy(CinemaScrapy):
         """This method scraps the synopsis of a movie
 
         Args:
-            movie_container (any) -- Web container of the movie
+            movie_container (any): Web container of the movie
 
         Returns:
-            dict -- Synopsis of a movie
+            dict: Synopsis of a movie
         """
         return {
             "Sinopsis": movie_container.find(id="ctl00_cph_lblSinopsis")
@@ -91,10 +87,10 @@ class CinemaLaPlataScrapy(CinemaScrapy):
         """This method scraps the schedule of a movie
 
         Args:
-            movie_container (any) -- Web container of the movie
+            movie_container (any): Web container of the movie
 
         Returns:
-            dict -- Movie with schedule data
+            dict: Movie with schedule data
         """
         schedule_container = movie_container.find(
             "div", attrs={"id": "ctl00_cph_pnFunciones"}
@@ -127,13 +123,13 @@ class CinemaLaPlataScrapy(CinemaScrapy):
         )
 
     def _trim_trailing_points(self, movie):
-        """[summary]
+        """This method delete the trailing points on some of the movie traits 
 
         Args:
-            movie ([type]): [description]
+            movie (dict): A movie
 
         Returns:
-            [type]: [description]
+            dict: The movie without trailing points
         """
 
         if movie["Actores"][-1][-1] == ".":
