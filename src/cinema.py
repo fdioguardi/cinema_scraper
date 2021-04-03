@@ -11,8 +11,8 @@ class CinemaLaPlataScrapy(CinemaScrapy):
     """
 
     def __init__(self):
-        """[summary]
-        """
+        """This method initializes a Scrapy"""
+
         super().__init__(_cinema_page="http://www.cinemalaplata.com/")
 
     def _make_soup(self, link):
@@ -73,13 +73,13 @@ class CinemaLaPlataScrapy(CinemaScrapy):
         )
 
     def _scrape_movie_synopsis(self, movie_container):
-        """[summary]
+        """This method scraps the synopsis of a movie
 
         Args:
-            movie_container ([type]): [description]
+            movie_container (any) -- Web container of the movie
 
         Returns:
-            [type]: [description]
+            dict -- Synopsis of a movie
         """
         return {
             "Sinopsis": movie_container.find(id="ctl00_cph_lblSinopsis")
@@ -88,13 +88,13 @@ class CinemaLaPlataScrapy(CinemaScrapy):
         }
 
     def _scrape_movie_schedule(self, movie_container):
-        """[summary]
+        """This method scraps the schedule of a movie
 
         Args:
-            movie_container ([type]): [description]
+            movie_container (any) -- Web container of the movie
 
         Returns:
-            [type]: [description]
+            dict -- Movie with schedule data
         """
         schedule_container = movie_container.find(
             "div", attrs={"id": "ctl00_cph_pnFunciones"}
@@ -113,14 +113,15 @@ class CinemaLaPlataScrapy(CinemaScrapy):
         }
 
     def scrape_movie(self, movie_link):
-        """[summary]
+        """This method scrapes a movie page
 
         Args:
-            movie_link ([type]): [description]
+            movie_link (any): movie information container
 
         Returns:
-            [type]: [description]
+            dict: Data of movie
         """
+
         return super().scrape_movie(
             self._make_soup(self._cinema_page + movie_link)
         )
@@ -145,13 +146,13 @@ class CinemaLaPlataScrapy(CinemaScrapy):
         return movie
 
     def _normalize_movie(self, movie):
-        """[summary]
+        """This method normalizes a movie's data
 
         Args:
-            movie ([type]): [description]
+            movie (dict): A movie data
 
         Returns:
-            [type]: [description]
+            dict: Normalized movie data
         """
         normalized_keys = {
             "Calificacion": "Calificación",
@@ -164,10 +165,11 @@ class CinemaLaPlataScrapy(CinemaScrapy):
         return self._trim_trailing_points(movie)
 
     def scrape(self):
-        """[summary]
+        """This method starts the scrapping of Cinema La Plata's billboard page
 
         Returns:
-            [type]: [description]
+            dict: Data of movies from Cinepolis
+            str: Source of data (Cinema La Plata)
         """
         movies_container = self._make_soup(
             self._cinema_page + "Cartelera.aspx"
