@@ -34,9 +34,10 @@ class CinemaScrapy(ABC):
 
         Args:
             movie_container (any): Web container of the movie
-        
+
         Returns:
-            dict:  Dictionary with "Sinopsis" as key and a movie sinopsis as value
+            dict:  Dictionary with "Sinopsis" as key and a movie's synopsis as
+                value
         """
         return
 

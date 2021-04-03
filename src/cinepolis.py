@@ -8,7 +8,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 
 class CinepolisScrapy(CinemaScrapy):
     """Scrapper of Cinepolis's billboard
-    
+
         driver_executable (str): path to browser's driver
         browser_executable (str): path to the user's browser.exe
     """
@@ -17,8 +17,11 @@ class CinepolisScrapy(CinemaScrapy):
         """This method initialize the scrapy
 
         Args:
-            driver_executable (str, optional): This is the path to the user navigator driver. Defaults to "chromedriver".
-            browser_executable (str, optional): This is the path to the user's browser's executable. Defaults to "/usr/bin/brave".
+            driver_executable (str, optional): This is the path to the
+                user navigator driver. Defaults to "chromedriver".
+            browser_executable (str, optional): This is the path to the
+                user's browser's executable. Defaults to
+                "/usr/bin/brave".
         """
         super().__init__(_cinema_page="http://www.villagecines.com/")
         self.browser_executable = browser_executable
@@ -63,10 +66,12 @@ class CinepolisScrapy(CinemaScrapy):
         return cinema.find_element_by_class_name("btn-link").text.strip()
 
     def _scrape_movie_auditorium_and_schedule(self, cinema):
-        """This method obtains a dictionary with cinema's name and it's showtimes schedule
+        """
+        This method creates a dictionary with a cinema's name and
+        it's showtime schedule
 
         Args:
-            cinema (WebbElement): Web element with a cinemas schedule data
+            cinema (WebbElement): Web element with a cinema's schedule
 
         Returns:
             dict: auditorium as key and schedule as value
@@ -110,9 +115,10 @@ class CinepolisScrapy(CinemaScrapy):
 
         Args:
             movie_container (WebDriver): Web container of the movie
-        
+
         Returns:
-            dict:  Dictionary with "Sinopsis" as key and a movie sinopsis as value
+            dict:  Dictionary with "Sinopsis" as key and a movie's
+                synopsis as value
         """
         return {
             "Sinopsis": movie_driver.find_element_by_id(
@@ -121,13 +127,16 @@ class CinepolisScrapy(CinemaScrapy):
         }
 
     def _wait_for_traits(self, movie_driver, timeout=10):
-        """Wait 'timeout' seconds for traits to load. Else explode
+        """Wait for traits to load.
 
         Args:
             movie_driver (WebDriver): Movie's data container
-            timeout (int, optional): time in second, to wait for tha page to do something. Defaults to 10.
-        
+            timeout (int, optional): time in second, to wait for tha
+                page to do something. Defaults to 10.
+
         Raises:
+            TimeoutException: When the trait didn't load after 'timeout'
+            seconds
 
         """
 
@@ -204,7 +213,8 @@ class CinepolisScrapy(CinemaScrapy):
         return movie
 
     def scrape(self):
-        """This method starts the scrapping of a cinepolis's billboard page
+        """
+        This method starts the scrapping of a cinepolis's billboard page
 
         Returns:
             dict: Data of movies
