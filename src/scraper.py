@@ -1,3 +1,4 @@
+from os import getcwd
 from os.path import join, isdir
 from functools import reduce
 from datetime import datetime
@@ -7,11 +8,20 @@ from cinepolis import CinepolisScrapy
 
 
 class Scraper:
-    def __init__(self):
-        """Initialize the scraper with two scrapies"""
+    """ 
+        driver_executable (str): path to browser's driver
+        browser_executable (str): path to the user's browser.exe 
+    """
+    def __init__(self, driver_executable="chromedriver", browser_executable="/usr/bin/brave"):
+        """Initialize the scraper with two scrapies
+
+        Args:
+            driver_executable (str, optional): Driver for navigation. Defaults to "chromedriver".
+            browser_executable (str, optional): Path to browser executable. Defaults to "/usr/bin/brave".
+        """        
         self.scrapies = [
             CinemaLaPlataScrapy(),
-            CinepolisScrapy(),
+            CinepolisScrapy(driver_executable=driver_executable, browser_executable=browser_executable),
         ]
 
     def _difference(self, dictionary, intersection):
@@ -128,7 +138,7 @@ class Scraper:
 
         return movies
 
-    def scrape(self, path="../data/"):
+    def scrape(self):
         """This method starts the scraping of both pages and saves the
             gathered data into the recieved path
 
@@ -138,12 +148,14 @@ class Scraper:
         """
         with open(
             join(
-                path,
+                getcwd(),
+                "data",
                 "movies_"
-                + datetime.today().strftime("%Y-%m-%d-%H:%M:%S")
+                + datetime.today().strftime("%Y-%m-%d-%H_%M_%S")
                 + ".json",
             ),
             "w",
+            encoding="utf8"
         ) as file:
             dump(
                 self._merge(

@@ -7,22 +7,11 @@ from selenium.webdriver.support.ui import WebDriverWait
 
 
 class CinepolisScrapy(CinemaScrapy):
-    """Scrapper of Cinepolis's billboard
+    """Scrapper of Cinepolis's billboard"""
 
-        driver_executable (str): path to browser's driver
-        browser_executable (str): path to the user's browser.exe
-    """
-
-    def __init__(self, driver_executable="chromedriver", browser_executable="/usr/bin/brave"):
-        """This method initialize the scrapy
-
-        Args:
-            driver_executable (str, optional): This is the path to the
-                user navigator driver. Defaults to "chromedriver".
-            browser_executable (str, optional): This is the path to the
-                user's browser's executable. Defaults to
-                "/usr/bin/brave".
-        """
+    def __init__(self, driver_executable, browser_executable):
+        """This method initialize the scrapy"""
+        
         super().__init__(_cinema_page="http://www.villagecines.com/")
         self.browser_executable = browser_executable
         self.driver_executable = driver_executable

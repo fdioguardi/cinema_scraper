@@ -1,7 +1,18 @@
-Paso 1: En el archivo `cinepolis.py` se encuentra la clase `CinepolisScraper`. El método __init__ define el path al driver a utilizar (por defecto chromedriver), y el path al ejecutable del browser a utilizar (por defecto Brave, en un sistema Linux). El script debería funcionar para navegadores con motores chromium, como Google Chrome, y Brave. Para usar otro navegador se tiene que modificar el método `driver()` de esa misma clase.
+Paso 1: En el archivo `cinepolis.py` se encuentra la clase `CinepolisScraper`. 
+    El método __init__ define el path al driver a utilizar (por defecto chromedriver recibido desde la clase Scraper), 
+    y el path al ejecutable del browser a utilizar (por defecto Brave, en un sistema Linux, tambien recibido desde la clase Scraper). 
+    El script debería funcionar para navegadores con motores chromium, como Google Chrome, y Brave. 
+    Para usar otro navegador se tiene que modificar el método `driver()` de esa misma clase. 
+    Los siguientes pasos asumen el uso de un navegador con motor chromium
 
-Paso 2: En el archivo `scraper.py` se encuentra la clase Scraper. Importar, y ejecutar el método de instancia `scrape()` de la siguiente manera:
+Paso 2: De esta [pagina](https://sites.google.com/a/chromium.org/chromedriver/home) descargar el .zip correspondiente a la versiond de su navegador,
+    extraerlo y guardarse el path del ejecutable al chromedriver.
+
+Paso 3: En el archivo `scraper.py` se encuentra la clase Scraper. Al instanciarla se debe mandar el path completo al .exe de su navegador.
+    Importar, y ejecutar el método de instancia `scrape()` de la siguiente manera:
 
 ```python
-Scrapper().scrape()
+>>from src import Scraper
+>>path_al_ejecutable = "browser.exe"
+>>Scrapper(browser_executable=path_al_ejecutable).scrape()
 ```
