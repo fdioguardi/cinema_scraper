@@ -1,3 +1,7 @@
+Alumnos:
+- Julian Marques de Abrantes
+- Felipe Dioguardi
+
 Uno de los primeros desafíos que encontramos al desarrollar el Scraper fue como almacenar los datos obtenidos, si utilizando objetos Movie o diccionarios.
 
 Este problema surgió cuando pensamos que en Cinema La Plata y Village iban a aparecer películas repetidas. Nuestro desafío fue evitar esa redundancia de información al almacenar los datos de ambas páginas. Puntualmente, el problema fue como mergear dos objetos de tipo Movie (con el mismo título de película, lo que los hace en esencia la misma película) en un único objeto. Esto, sumado a que crear dos objetos Movie parciales para luego unirlos nos dio mal olor, nos hizo optar por usar diccionarios en su lugar.
