@@ -1,4 +1,4 @@
-from abstract_cinema import CinemaScrapy
+from src.abstract_cinema import CinemaScrapy
 from selenium import webdriver
 from selenium.common.exceptions import TimeoutException
 from selenium.webdriver.common.by import By
@@ -10,8 +10,15 @@ class CinepolisScrapy(CinemaScrapy):
     """Scrapper of Cinepolis's billboard"""
 
     def __init__(self, driver_executable, browser_executable):
-        """This method initialize the scrapy"""
-        
+        """This method initialize the scrapy
+
+        Args:
+            driver_executable (str): Driver for navigation. Defaults to
+                "chromedriver".
+            browser_executable (str): Path to browser executable.
+                Defaults to "/usr/bin/brave".
+        """
+
         super().__init__(_cinema_page="http://www.villagecines.com/")
         self.browser_executable = browser_executable
         self.driver_executable = driver_executable

@@ -3,25 +3,37 @@ from os.path import join, isdir
 from functools import reduce
 from datetime import datetime
 from json import dump
-from cinema import CinemaLaPlataScrapy
-from cinepolis import CinepolisScrapy
+from src.cinema import CinemaLaPlataScrapy
+from src.cinepolis import CinepolisScrapy
 
 
 class Scraper:
-    """ 
-        driver_executable (str): path to browser's driver
-        browser_executable (str): path to the user's browser.exe 
+    """A class to merge scraped data
+
+    driver_executable (str): path to the executable for the browser's
+        driver
+    browser_executable (str): path to the user's browser.exe
     """
-    def __init__(self, driver_executable="chromedriver", browser_executable="/usr/bin/brave"):
+
+    def __init__(
+        self,
+        driver_executable="chromedriver",
+        browser_executable="/usr/bin/brave",
+    ):
         """Initialize the scraper with two scrapies
 
         Args:
-            driver_executable (str, optional): Driver for navigation. Defaults to "chromedriver".
-            browser_executable (str, optional): Path to browser executable. Defaults to "/usr/bin/brave".
-        """        
+            driver_executable (str, optional): Driver for navigation.
+                Defaults to "chromedriver".
+            browser_executable (str, optional): Path to browser
+                executable. Defaults to "/usr/bin/brave".
+        """
         self.scrapies = [
             CinemaLaPlataScrapy(),
-            CinepolisScrapy(driver_executable=driver_executable, browser_executable=browser_executable),
+            CinepolisScrapy(
+                driver_executable=driver_executable,
+                browser_executable=browser_executable,
+            ),
         ]
 
     def _difference(self, dictionary, intersection):
@@ -155,7 +167,7 @@ class Scraper:
                 + ".json",
             ),
             "w",
-            encoding="utf8"
+            encoding="utf8",
         ) as file:
             dump(
                 self._merge(

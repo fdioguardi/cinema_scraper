@@ -1,4 +1,4 @@
-from abstract_cinema import CinemaScrapy
+from src.abstract_cinema import CinemaScrapy
 from bs4 import BeautifulSoup
 import requests
 
@@ -123,7 +123,7 @@ class CinemaLaPlataScrapy(CinemaScrapy):
         )
 
     def _trim_trailing_points(self, movie):
-        """This method delete the trailing points on some of the movie traits 
+        """This method delete the trailing points on some of the movie traits
 
         Args:
             movie (dict): A movie
